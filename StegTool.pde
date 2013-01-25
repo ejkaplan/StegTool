@@ -43,7 +43,7 @@ void setup() {
           .setColor(color(255, 0, 0));
 
   decoded_view = cp5.addTextarea("decoded_view")
-    .setPosition(20, 20)
+    .setPosition(20, 25)
       .setSize(width-40, 60)
         .moveTo("decode")
           .setLineHeight(14)
@@ -172,7 +172,7 @@ void encode_message() {
     codeImage(img, message);
     img.save(cp5.get(Textfield.class, "output").getText());
     cp5.get(Textfield.class, "message").setText("DONE");
-    cp5.get(Textfield.class, "image").setText(cp5.get(Textfield.class, "output").getText());
+    cp5.get(Textfield.class, "image").clear();
     cp5.get(Textfield.class, "output").clear();
     cp5.get(Textfield.class, "password").clear();
   } 
@@ -396,10 +396,18 @@ char decypher(char c, char p) {
 void controlEvent(ControlEvent theControlEvent) {
   if (theControlEvent.isTab()) {
     if (theControlEvent.getTab().getId() == 0) {
+      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textfield.class, "image").clear();
+      cp5.get(Textfield.class, "output").clear();
+      cp5.get(Textfield.class, "password").clear();
       cp5.get(Textfield.class, "image").setLabel("base image location (.jpg or .png)");
       cp5.get(Textfield.class, "output").setLabel("coded image save location (.png)");
     } 
     else if (theControlEvent.getTab().getId() == 1) {
+      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textfield.class, "image").clear();
+      cp5.get(Textfield.class, "output").clear();
+      cp5.get(Textfield.class, "password").clear();
       cp5.get(Textfield.class, "image").setLabel("coded image location (.png)");
       cp5.get(Textfield.class, "output").setLabel("decoded text save location (.txt)");
     }
