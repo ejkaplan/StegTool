@@ -1,0 +1,3 @@
+Steganography is the process of hiding a message so that it doesn't look like a message is hidden. 
+
+This tool takes text and hides it in an image by subtly altering the colors. Which pixels are meaningful, the order in which the pixels are meaningful and the cypher applied to the text are all determined by a password specific to the image, making it nearly impossible to extract the message from the image without the password. (If anybody thinks of a way to extract the message without knowing that image's password, I'd be very interested to hear it.)
