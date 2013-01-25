@@ -12,6 +12,8 @@ HashMap decode = new HashMap();
 Random r = new Random("".hashCode());
 LinkedList<int[]> coords = new LinkedList<int[]>();
 
+Textarea decoded_view;
+
 String message = "Secret Message";
 ControlP5 cp5;
 PImage img;
@@ -25,10 +27,14 @@ void setup() {
   cp5 = new ControlP5(this);
 
   cp5.addTab("decode")
-    .setLabel("decode");
+    .setLabel("decode")
+      .setId(1)
+        .activateEvent(true);
 
   cp5.getTab("default")
-    .setLabel("encode");
+    .setLabel("encode")
+      .setId(0)
+        .activateEvent(true);
 
   cp5.addTextfield("message")
     .setPosition(20, 30)
@@ -36,29 +42,12 @@ void setup() {
         .setFocus(false)
           .setColor(color(255, 0, 0));
 
-  Textarea myTextarea = cp5.addTextarea("decoded_message")
-    .setPosition(100, 100)
-      .setSize(200, 200)
-        .setFont(createFont("arial", 12))
+  decoded_view = cp5.addTextarea("decoded_view")
+    .setPosition(20, 20)
+      .setSize(width-40, 60)
+        .moveTo("decode")
           .setLineHeight(14)
-            .setColor(color(128))
-              .setColorBackground(color(255, 100))
-                .setColorForeground(color(255, 100));
-  ;
-
-  //TODO: Fix the textarea
-  myTextarea.moveTo("decode");
-
-  cp5.getController("decoded_message").setText("Lorem Ipsum is simply dummy text of the printing and typesetting"
-    +" industry. Lorem Ipsum has been the industry's standard dummy text"
-    +" ever since the 1500s, when an unknown printer took a galley of type"
-    +" and scrambled it to make a type specimen book. It has survived not"
-    +" only five centuries, but also the leap into electronic typesetting,"
-    +" remaining essentially unchanged. It was popularised in the 1960s"
-    +" with the release of Letraset sheets containing Lorem Ipsum passages,"
-    +" and more recently with desktop publishing software like Aldus"
-    +" PageMaker including versions of Lorem Ipsum."
-    );
+            .setFont(14);
 
   cp5.addButton("load_text")
     .setPosition(width-100, 30)
@@ -70,7 +59,8 @@ void setup() {
     .setPosition(20, 90)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0));
+          .setColor(color(255, 0, 0))
+            .moveTo("global");
 
   cp5.addButton("load_image")
     .setPosition(width-100, 90)
@@ -78,11 +68,14 @@ void setup() {
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
+  cp5.getController("load_image").moveTo("global");
+
   cp5.addTextfield("output")
     .setPosition(20, 150)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0));
+          .setColor(color(255, 0, 0))
+            .moveTo("global");
 
   cp5.addButton("save_location")
     .setPosition(width-100, 150)
@@ -90,12 +83,16 @@ void setup() {
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
+  cp5.getController("save_location").moveTo("global");
+
   cp5.addTextfield("password")
     .setPosition(20, 210)
       .setSize(width-40, 40)
         .setFocus(false)
           .setColor(color(255, 0, 0))
             .setPasswordMode(true);
+
+  cp5.getController("password").moveTo("global");
 
   cp5.addButton("encode_message")
     .setPosition(20, 280)
@@ -118,6 +115,8 @@ void setup() {
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.getController("clear").moveTo("global");
+  cp5.get(Textfield.class, "image").setLabel("base image location (.jpg or .png)");
+  cp5.get(Textfield.class, "output").setLabel("coded image save location (.png)");
 }
 
 void load_text() {
@@ -126,6 +125,10 @@ void load_text() {
 
 void textSelected(File selection) {
   if (selection != null) {
+    if (!selection.getAbsolutePath().endsWith(".txt")) {
+      cp5.get(Textfield.class, "message").setText("Invalid - please load a .txt file."); 
+      return;
+    }
     String[] text = loadStrings(selection.getAbsolutePath());
     String out = "";
     for (String s : text) {
@@ -194,7 +197,7 @@ void decode_message() {
       }
       );
     }
-    cp5.get(Textfield.class, "message").setText(message);
+    decoded_view.setText(message);
     cp5.get(Textfield.class, "output").clear();
     cp5.get(Textfield.class, "password").clear();
   } 
@@ -388,6 +391,19 @@ char decypher(char c, char p) {
   val += 97;
   if (val == 123) return ' ';
   else return (char)val;
+}
+
+void controlEvent(ControlEvent theControlEvent) {
+  if (theControlEvent.isTab()) {
+    if (theControlEvent.getTab().getId() == 0) {
+      cp5.get(Textfield.class, "image").setLabel("base image location (.jpg or .png)");
+      cp5.get(Textfield.class, "output").setLabel("coded image save location (.png)");
+    } 
+    else if (theControlEvent.getTab().getId() == 1) {
+      cp5.get(Textfield.class, "image").setLabel("coded image location (.png)");
+      cp5.get(Textfield.class, "output").setLabel("decoded text save location (.txt)");
+    }
+  }
 }
 
 void setupCoordList(PImage img) {
