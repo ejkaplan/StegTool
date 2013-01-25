@@ -13,6 +13,7 @@ Random r = new Random("".hashCode());
 LinkedList<int[]> coords = new LinkedList<int[]>();
 
 Textarea decoded_view;
+boolean encode_tab = true;
 
 String message = "Secret Message";
 ControlP5 cp5;
@@ -144,7 +145,22 @@ void load_image() {
 }
 
 void imageSelected(File selection) {
-  if (selection != null) cp5.get(Textfield.class, "image").setText(selection.getAbsolutePath());
+  if (selection != null) {
+    String path = selection.getAbsolutePath();
+    if (encode_tab) {
+      if (!(path.endsWith("jpg") || path.endsWith("png"))) {
+        cp5.get(Textfield.class, "image").setText("Filetype must be .jpg or .png");
+        return;
+      }
+    } 
+    else {
+      if (!(path.endsWith("png"))) {
+        cp5.get(Textfield.class, "image").setText("Filetype must be .png");
+        return;
+      }
+    }
+    cp5.get(Textfield.class, "image").setText(path);
+  }
 }
 
 void save_location() {
@@ -152,7 +168,22 @@ void save_location() {
 }
 
 void save_loc(File selection) {
-  if (selection != null) cp5.get(Textfield.class, "output").setText(selection.getAbsolutePath());
+  if (selection != null) { 
+    String path = selection.getAbsolutePath();
+    if (encode_tab) {
+      if (!path.endsWith("png")) {
+        cp5.get(Textfield.class, "output").setText("Filetype must be .png");
+        return;
+      }
+    } 
+    else {
+      if (!path.endsWith("txt")) {
+        cp5.get(Textfield.class, "output").setText("Filetype must be .txt");
+        return;
+      }
+    }
+    cp5.get(Textfield.class, "output").setText(selection.getAbsolutePath());
+  }
 }
 
 int[] getRandom() {
@@ -396,6 +427,7 @@ char decypher(char c, char p) {
 void controlEvent(ControlEvent theControlEvent) {
   if (theControlEvent.isTab()) {
     if (theControlEvent.getTab().getId() == 0) {
+      encode_tab = true;
       cp5.get(Textfield.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
@@ -404,6 +436,7 @@ void controlEvent(ControlEvent theControlEvent) {
       cp5.get(Textfield.class, "output").setLabel("coded image save location (.png)");
     } 
     else if (theControlEvent.getTab().getId() == 1) {
+      encode_tab = false;
       cp5.get(Textfield.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
