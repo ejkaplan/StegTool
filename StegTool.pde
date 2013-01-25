@@ -24,44 +24,74 @@ void setup() {
   frame.setTitle("StegTool 2.2");
   cp5 = new ControlP5(this);
 
+  cp5.addTab("decode")
+    .setLabel("decode");
+
+  cp5.getTab("default")
+    .setLabel("encode");
+
   cp5.addTextfield("message")
-    .setPosition(20, 20)
+    .setPosition(20, 30)
       .setSize(width-140, 40)
         .setFocus(false)
           .setColor(color(255, 0, 0));
 
+  Textarea myTextarea = cp5.addTextarea("decoded_message")
+    .setPosition(100, 100)
+      .setSize(200, 200)
+        .setFont(createFont("arial", 12))
+          .setLineHeight(14)
+            .setColor(color(128))
+              .setColorBackground(color(255, 100))
+                .setColorForeground(color(255, 100));
+  ;
+
+  //TODO: Fix the textarea
+  myTextarea.moveTo("decode");
+
+  cp5.getController("decoded_message").setText("Lorem Ipsum is simply dummy text of the printing and typesetting"
+    +" industry. Lorem Ipsum has been the industry's standard dummy text"
+    +" ever since the 1500s, when an unknown printer took a galley of type"
+    +" and scrambled it to make a type specimen book. It has survived not"
+    +" only five centuries, but also the leap into electronic typesetting,"
+    +" remaining essentially unchanged. It was popularised in the 1960s"
+    +" with the release of Letraset sheets containing Lorem Ipsum passages,"
+    +" and more recently with desktop publishing software like Aldus"
+    +" PageMaker including versions of Lorem Ipsum."
+    );
+
   cp5.addButton("load_text")
-    .setPosition(width-100, 20)
+    .setPosition(width-100, 30)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addTextfield("image")
-    .setPosition(20, 80)
+    .setPosition(20, 90)
       .setSize(width-140, 40)
         .setFocus(false)
           .setColor(color(255, 0, 0));
 
   cp5.addButton("load_image")
-    .setPosition(width-100, 80)
+    .setPosition(width-100, 90)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addTextfield("output")
-    .setPosition(20, 140)
+    .setPosition(20, 150)
       .setSize(width-140, 40)
         .setFocus(false)
           .setColor(color(255, 0, 0));
 
   cp5.addButton("save_location")
-    .setPosition(width-100, 140)
+    .setPosition(width-100, 150)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addTextfield("password")
-    .setPosition(20, 200)
+    .setPosition(20, 210)
       .setSize(width-40, 40)
         .setFocus(false)
           .setColor(color(255, 0, 0))
@@ -74,27 +104,20 @@ void setup() {
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addButton("decode_message")
+    .setPosition(20, 280)
+      .setSize(80, 40)
+        .getCaptionLabel()
+          .align(ControlP5.CENTER, ControlP5.CENTER);
+
+  cp5.getController("decode_message").moveTo("decode");
+
+  cp5.addButton("clear")
     .setPosition(120, 280)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
-  cp5.addButton("clear")
-    .setPosition(220, 280)
-      .setSize(80, 40)
-        .getCaptionLabel()
-          .align(ControlP5.CENTER, ControlP5.CENTER);
-
-  cp5.addTextarea("instructions")
-    .setPosition(320, 280)
-      .setSize(width-20-320, 40)
-        .setText("To encode, put the image that you want to use in the same directory "+
-          "as the program, then type the message in the message box and the name of the output image "+
-          "in the output box. Your output must be of type .png. If you want your message password "+
-          "protected, you also need to type the password in the password box.\n\n"+
-          "To decode, put the image to decode in the same directory as the program and "+
-          "type the name of the image in the image box. If the message is password protected, "+
-          "you will also need to enter the password.");
+  cp5.getController("clear").moveTo("global");
 }
 
 void load_text() {
