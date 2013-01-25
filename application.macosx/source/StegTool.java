@@ -1,6 +1,5 @@
 import processing.core.*; 
 import processing.data.*; 
-import processing.event.*; 
 import processing.opengl.*; 
 
 import controlP5.*; 
@@ -12,13 +11,19 @@ import java.util.Random;
 import java.util.Iterator; 
 import java.util.Map; 
 
-import java.util.HashMap; 
-import java.util.ArrayList; 
-import java.io.BufferedReader; 
-import java.io.PrintWriter; 
-import java.io.InputStream; 
-import java.io.OutputStream; 
-import java.io.IOException; 
+import java.applet.*; 
+import java.awt.Dimension; 
+import java.awt.Frame; 
+import java.awt.event.MouseEvent; 
+import java.awt.event.KeyEvent; 
+import java.awt.event.FocusEvent; 
+import java.awt.Image; 
+import java.io.*; 
+import java.net.*; 
+import java.text.*; 
+import java.util.*; 
+import java.util.zip.*; 
+import java.util.regex.*; 
 
 public class StegTool extends PApplet {
 
@@ -151,7 +156,7 @@ public void load_text() {
 public void textSelected(File selection) {
   if (selection != null) {
     if (!selection.getAbsolutePath().endsWith(".txt")) {
-      cp5.get(Textfield.class, "message").setText("Invalid - please load a .txt file."); 
+      cp5.get(Textfield.class, "output").setText("Invalid - please load a .txt file."); 
       return;
     }
     String[] text = loadStrings(selection.getAbsolutePath());
@@ -217,11 +222,17 @@ public int[] getRandom() {
 public void encode_message() {
   try {
     String message = cp5.get(Textfield.class, "message").getText();
+    println(message);
     String cypher = cp5.get(Textfield.class, "password").getText();
+    println(cypher);
     r = new Random(cypher.hashCode());
     message = clean(message);
+    println(message);
     message = cypher(message, cypher);
+    println(message);
     message = encode(message);
+    println(message);
+    println("--------------");
     PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
     setupCoordList(img);
     codeImage(img, message);
@@ -243,8 +254,11 @@ public void decode_message() {
     String cypher = cp5.get(Textfield.class, "password").getText();
     r = new Random(cypher.hashCode());
     String message = decodeImage(img);
+    println(message);
     message = decode(message);
+    println(message);
     message = decypher(message, cypher);
+    println(message);
     String outFile = cp5.get(Textfield.class, "output").getText();
     if (outFile.length() > 0) {
       saveStrings(outFile, new String[] {
@@ -378,7 +392,7 @@ public String clean(String message) {
 }
 
 public String encode(String message) {
-  message = clean(message);
+  //message = clean(message);
   String out = "";
   for (char c : message.toCharArray()) {
     out += code.get(c);
