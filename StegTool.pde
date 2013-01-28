@@ -388,11 +388,10 @@ String decode(String encoded) {
 String cypher(String message, String password) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  char[] mess = message.toCharArray();
-  char[] pass = password.toCharArray();
+  Random r = new Random((password+password).hashCode());
   String out = "";
-  for (int i = 0; i < mess.length; i++) {
-    out += cypher(mess[i], pass[i%pass.length]);
+  for (int i = 0; i < message.length(); i++) {
+    out += cypher(message.charAt(i), r.nextInt(27));
   }
   return out;
 }
@@ -400,11 +399,10 @@ String cypher(String message, String password) {
 String decypher(String message, String password) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  char[] mess = message.toCharArray();
-  char[] pass = password.toCharArray();
+  Random r = new Random((password+password).hashCode());
   String out = "";
-  for (int i = 0; i < mess.length; i++) {
-    out += decypher(mess[i], pass[i%pass.length]);
+  for (int i = 0; i < message.length(); i++) {
+    out += decypher(message.charAt(i), r.nextInt(27));
   }
   return out;
 }
@@ -421,11 +419,35 @@ char cypher(char c, char p) {
   return (char)val;
 }
 
+char cypher(char c, int p) {
+  c = Character.toLowerCase(c);
+  int val = ((int)c);
+  if (val == 32) val = 123;
+  val -= 97;
+  val += p;
+  val %= 27;
+  val += 97;
+  if (val == 123) return ' ';
+  return (char)val;
+}
+
 char decypher(char c, char p) {
   c = Character.toLowerCase(c);
   if (c == ' ') c = '{';
   int val = ((int)c) - 97;
   val -= (int)p;
+  while (val < 0) val += 27;
+  val %= 27;
+  val += 97;
+  if (val == 123) return ' ';
+  else return (char)val;
+}
+
+char decypher(char c, int p) {
+  c = Character.toLowerCase(c);
+  if (c == ' ') c = '{';
+  int val = ((int)c) - 97;
+  val -= p;
   while (val < 0) val += 27;
   val %= 27;
   val += 97;
