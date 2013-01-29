@@ -37,11 +37,10 @@ void setup() {
       .setId(0)
         .activateEvent(true);
 
-  cp5.addTextfield("message")
+  cp5.addTextarea("message")
     .setPosition(20, 30)
       .setSize(width-140, 40)
-        .setFocus(false)
-          .setColor(color(255, 0, 0));
+        .setColor(color(255, 0, 0));
 
   decoded_view = cp5.addTextarea("decoded_view")
     .setPosition(20, 25)
@@ -133,10 +132,10 @@ void textSelected(File selection) {
     String[] text = loadStrings(selection.getAbsolutePath());
     String out = "";
     for (String s : text) {
-      out += s;
+      out += s + '\n';
     }
     out = clean(out);
-    cp5.get(Textfield.class, "message").setText(out);
+    cp5.get(Textarea.class, "message").setText(out);
   }
 }
 
@@ -191,8 +190,8 @@ int[] getRandom() {
 }
 
 void encode_message() {
-  try {
-    String message = cp5.get(Textfield.class, "message").getText();
+  //try {
+    String message = cp5.get(Textarea.class, "message").getText();
     println(message);
     String cypher = cp5.get(Textfield.class, "password").getText();
     println(cypher);
@@ -212,10 +211,11 @@ void encode_message() {
     cp5.get(Textfield.class, "image").clear();
     cp5.get(Textfield.class, "output").clear();
     cp5.get(Textfield.class, "password").clear();
-  } 
+  //} 
+  /*
   catch (Exception e) {
     cp5.get(Textfield.class, "image").setText("Unable to load image.");
-  }
+  } */
 }
 
 void decode_message() {
@@ -354,9 +354,9 @@ String clean(String message) {
   message = message.toLowerCase();
   String out = "";
   for (char c : message.toCharArray()) {
-    if (Character.isLetter(c))
+    if (Character.isLetter(c) || c == '\n')
       out += c;
-    if (Character.isWhitespace(c))
+    else if (Character.isWhitespace(c))
       out += ' ';
   }
   return out;
@@ -391,7 +391,7 @@ String cypher(String message, String password) {
   Random r = new Random((password+password).hashCode());
   String out = "";
   for (int i = 0; i < message.length(); i++) {
-    out += cypher(message.charAt(i), r.nextInt(27));
+    out += cypher(message.charAt(i), r.nextInt(28));
   }
   return out;
 }
@@ -402,56 +402,36 @@ String decypher(String message, String password) {
   Random r = new Random((password+password).hashCode());
   String out = "";
   for (int i = 0; i < message.length(); i++) {
-    out += decypher(message.charAt(i), r.nextInt(27));
+    out += decypher(message.charAt(i), r.nextInt(28));
   }
   return out;
-}
-
-char cypher(char c, char p) {
-  c = Character.toLowerCase(c);
-  int val = ((int)c);
-  if (val == 32) val = 123;
-  val -= 97;
-  val += (int)p;
-  val %= 27;
-  val += 97;
-  if (val == 123) return ' ';
-  return (char)val;
 }
 
 char cypher(char c, int p) {
   c = Character.toLowerCase(c);
   int val = ((int)c);
   if (val == 32) val = 123;
+  if (val == 10 || val == 13) val = 124;
   val -= 97;
   val += p;
-  val %= 27;
+  val %= 28;
   val += 97;
   if (val == 123) return ' ';
+  else if (val == 124) return '\n';
   return (char)val;
-}
-
-char decypher(char c, char p) {
-  c = Character.toLowerCase(c);
-  if (c == ' ') c = '{';
-  int val = ((int)c) - 97;
-  val -= (int)p;
-  while (val < 0) val += 27;
-  val %= 27;
-  val += 97;
-  if (val == 123) return ' ';
-  else return (char)val;
 }
 
 char decypher(char c, int p) {
   c = Character.toLowerCase(c);
   if (c == ' ') c = '{';
+  if (c == '\n') c = '|';
   int val = ((int)c) - 97;
   val -= p;
-  while (val < 0) val += 27;
-  val %= 27;
+  while (val < 0) val += 28;
+  val %= 28;
   val += 97;
   if (val == 123) return ' ';
+  else if (val == 124) return '\n';
   else return (char)val;
 }
 
@@ -492,33 +472,34 @@ void setupCoordList(PImage img) {
 
 void setupCodes() {
   // Encodings:
-  code.put('u', "00000");
-  code.put('t', "00001");
-  code.put('s', "00010");
-  code.put('r', "00011");
-  code.put('q', "00100");
-  code.put('p', "00101");
-  code.put('o', "00110");
-  code.put('n', "00111");
-  code.put('m', "01000");
-  code.put('l', "01001");
-  code.put('k', "01010");
-  code.put('j', "01011");
-  code.put('i', "01100");
-  code.put('h', "01101");
-  code.put('g', "01110");
-  code.put('f', "01111");
-  code.put('e', "10000");
-  code.put('d', "10001");
-  code.put('c', "10010");
-  code.put('b', "10011");
-  code.put('a', "10100");
-  code.put(' ', "10101");
-  code.put('z', "1011");
-  code.put('y', "1100");
-  code.put('x', "1101");
-  code.put('w', "1110");
-  code.put('v', "1111");
+  code.put('v', "00000");
+  code.put('u', "00001");
+  code.put('t', "00010");
+  code.put('s', "00011");
+  code.put('r', "00100");
+  code.put('q', "00101");
+  code.put('p', "00110");
+  code.put('o', "00111");
+  code.put('n', "01000");
+  code.put('m', "01001");
+  code.put('l', "01010");
+  code.put('k', "01011");
+  code.put('j', "01100");
+  code.put('i', "01101");
+  code.put('h', "01110");
+  code.put('g', "01111");
+  code.put('f', "10000");
+  code.put('e', "10001");
+  code.put('d', "10010");
+  code.put('c', "10011");
+  code.put('b', "10100");
+  code.put('a', "10101");
+  code.put(' ', "10110");
+  code.put('\n', "10111");
+  code.put('z', "1100");
+  code.put('y', "1101");
+  code.put('x', "1110");
+  code.put('w', "1111");
   // Decodings:
   Iterator i = code.entrySet().iterator();
   while (i.hasNext ()) {
