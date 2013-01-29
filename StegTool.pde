@@ -24,7 +24,7 @@ void setup() {
 
   size(640, 340);
   background(0);
-  frame.setTitle("StegTool 2.2");
+  frame.setTitle("StegTool 2.4");
   cp5 = new ControlP5(this);
 
   cp5.addTab("decode")
