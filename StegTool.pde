@@ -204,17 +204,10 @@ int[] getRandom() {
 void encode_message() {
   //try {
   String message = cp5.get(Textarea.class, "message").getText();
-  println(message);
   String cypher = cp5.get(Textfield.class, "password").getText();
-  println(cypher);
   r = new Random(cypher.hashCode());
-  message = clean(message);
-  println(message);
   message = cypher(message, cypher);
-  println(message);
   message = encode(message);
-  println(message);
-  println("--------------");
   PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
   setupCoordList(img);
   codeImage(img, message);
@@ -237,11 +230,8 @@ void decode_message() {
     String cypher = cp5.get(Textfield.class, "password").getText();
     r = new Random(cypher.hashCode());
     String message = decodeImage(img);
-    println(message);
     message = decode(message);
-    println(message);
     message = decypher(message, cypher);
-    println(message);
     String outFile = cp5.get(Textfield.class, "output").getText();
     if (outFile.length() > 0) {
       saveStrings(outFile, new String[] {
