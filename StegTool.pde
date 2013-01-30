@@ -1,4 +1,4 @@
-float version = 2.41;
+String version = "2.4.2";
 
 import controlP5.*;
 import java.io.File;
@@ -60,12 +60,12 @@ void setup() {
 
   cp5.addButton("load_text")
     .setPosition(width-100, 30)
-      .setSize(80, 40)
+      .setSize(80, 50)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addTextfield("image")
-    .setPosition(20, 90)
+    .setPosition(20, 100)
       .setSize(width-140, 40)
         .setFocus(false)
           .setColor(color(200))
@@ -73,7 +73,7 @@ void setup() {
               .moveTo("global");
 
   cp5.addButton("load_image")
-    .setPosition(width-100, 90)
+    .setPosition(width-100, 100)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
@@ -81,7 +81,7 @@ void setup() {
   cp5.getController("load_image").moveTo("global");
 
   cp5.addTextfield("output")
-    .setPosition(20, 150)
+    .setPosition(20, 160)
       .setSize(width-140, 40)
         .setFocus(false)
           .setColor(color(200))
@@ -89,7 +89,7 @@ void setup() {
               .moveTo("global");
 
   cp5.addButton("save_location")
-    .setPosition(width-100, 150)
+    .setPosition(width-100, 160)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
@@ -97,7 +97,7 @@ void setup() {
   cp5.getController("save_location").moveTo("global");
 
   cp5.addTextfield("password")
-    .setPosition(20, 210)
+    .setPosition(20, 220)
       .setSize(width-40, 40)
         .setFocus(false)
           .setColor(color(200))
@@ -388,9 +388,17 @@ String decode(String encoded) {
 }
 
 String cypher(String message, String password) {
+  return cypher(message, password, true);
+}
+
+String cypher(String message, String password, boolean scramble) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  Random r = new Random((password+password).hashCode());
+  Random r;
+  if (scramble)
+    r = new Random(cypher(password, password, false).hashCode());
+  else
+    r = new Random(password.hashCode());
   String out = "";
   for (int i = 0; i < message.length(); i++) {
     out += cypher(message.charAt(i), r.nextInt(28));
@@ -401,7 +409,7 @@ String cypher(String message, String password) {
 String decypher(String message, String password) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  Random r = new Random((password+password).hashCode());
+  Random r = new Random(cypher(password, password, false).hashCode());
   String out = "";
   for (int i = 0; i < message.length(); i++) {
     out += decypher(message.charAt(i), r.nextInt(28));
@@ -474,34 +482,34 @@ void setupCoordList(PImage img) {
 
 void setupCodes() {
   // Encodings:
-  code.put('v', "00000");
-  code.put('u', "00001");
-  code.put('t', "00010");
-  code.put('s', "00011");
-  code.put('r', "00100");
-  code.put('q', "00101");
-  code.put('p', "00110");
-  code.put('o', "00111");
-  code.put('n', "01000");
-  code.put('m', "01001");
-  code.put('l', "01010");
-  code.put('k', "01011");
-  code.put('j', "01100");
-  code.put('i', "01101");
-  code.put('h', "01110");
-  code.put('g', "01111");
-  code.put('f', "10000");
-  code.put('e', "10001");
-  code.put('d', "10010");
-  code.put('c', "10011");
-  code.put('b', "10100");
-  code.put('a', "10101");
-  code.put(' ', "10110");
-  code.put('\n', "10111");
-  code.put('z', "1100");
-  code.put('y', "1101");
-  code.put('x', "1110");
-  code.put('w', "1111");
+  code.put('a', "00000");
+  code.put('b', "00001");
+  code.put('c', "00010");
+  code.put('d', "00011");
+  code.put('e', "00100");
+  code.put('f', "00101");
+  code.put('g', "00110");
+  code.put('h', "00111");
+  code.put('i', "01000");
+  code.put('j', "01001");
+  code.put('k', "01010");
+  code.put('l', "01011");
+  code.put('m', "01100");
+  code.put('n', "01101");
+  code.put('o', "01110");
+  code.put('p', "01111");
+  code.put('q', "10000");
+  code.put('r', "10001");
+  code.put('s', "10010");
+  code.put('t', "10011");
+  code.put('u', "10100");
+  code.put('v', "10101");
+  code.put('w', "10110");
+  code.put('x', "10111");
+  code.put('y', "1100");
+  code.put('z', "1101");
+  code.put(' ', "1110");
+  code.put('\n', "1111");
   // Decodings:
   Iterator i = code.entrySet().iterator();
   while (i.hasNext ()) {

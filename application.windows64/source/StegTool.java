@@ -1,5 +1,6 @@
 import processing.core.*; 
 import processing.data.*; 
+import processing.event.*; 
 import processing.opengl.*; 
 
 import controlP5.*; 
@@ -11,21 +12,17 @@ import java.util.Random;
 import java.util.Iterator; 
 import java.util.Map; 
 
-import java.applet.*; 
-import java.awt.Dimension; 
-import java.awt.Frame; 
-import java.awt.event.MouseEvent; 
-import java.awt.event.KeyEvent; 
-import java.awt.event.FocusEvent; 
-import java.awt.Image; 
-import java.io.*; 
-import java.net.*; 
-import java.text.*; 
-import java.util.*; 
-import java.util.zip.*; 
-import java.util.regex.*; 
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
 
 public class StegTool extends PApplet {
+
+float version = 2.41f;
 
 
 
@@ -53,7 +50,7 @@ public void setup() {
 
   size(640, 340);
   background(0);
-  frame.setTitle("StegTool 2.2");
+  frame.setTitle("StegTool"+version);
   cp5 = new ControlP5(this);
 
   cp5.addTab("decode")
@@ -66,34 +63,41 @@ public void setup() {
       .setId(0)
         .activateEvent(true);
 
-  cp5.addTextfield("message")
+  cp5.addTextarea("message")
     .setPosition(20, 30)
-      .setSize(width-140, 40)
-        .setFocus(false)
-          .setColor(color(255, 0, 0));
+      .setSize(width-140, 50)
+        .setColor(color(200))
+          .setFont(createFont("arial", 11))
+            .setColorBackground(color(255, 100))
+              .setColorForeground(color(255, 100));
 
   decoded_view = cp5.addTextarea("decoded_view")
-    .setPosition(20, 25)
-      .setSize(width-40, 60)
+    .setPosition(20, 30)
+      .setSize(width-140, 50)
         .moveTo("decode")
           .setLineHeight(14)
-            .setFont(14);
+            .setFont(createFont("arial", 11))
+
+              .setColor(color(200))
+                .setColorBackground(color(255, 100))
+                  .setColorForeground(color(255, 100));
 
   cp5.addButton("load_text")
     .setPosition(width-100, 30)
-      .setSize(80, 40)
+      .setSize(80, 50)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
 
   cp5.addTextfield("image")
-    .setPosition(20, 90)
+    .setPosition(20, 100)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .moveTo("global");
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .moveTo("global");
 
   cp5.addButton("load_image")
-    .setPosition(width-100, 90)
+    .setPosition(width-100, 100)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
@@ -101,14 +105,15 @@ public void setup() {
   cp5.getController("load_image").moveTo("global");
 
   cp5.addTextfield("output")
-    .setPosition(20, 150)
+    .setPosition(20, 160)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .moveTo("global");
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .moveTo("global");
 
   cp5.addButton("save_location")
-    .setPosition(width-100, 150)
+    .setPosition(width-100, 160)
       .setSize(80, 40)
         .getCaptionLabel()
           .align(ControlP5.CENTER, ControlP5.CENTER);
@@ -116,11 +121,12 @@ public void setup() {
   cp5.getController("save_location").moveTo("global");
 
   cp5.addTextfield("password")
-    .setPosition(20, 210)
+    .setPosition(20, 220)
       .setSize(width-40, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .setPasswordMode(true);
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .setPasswordMode(true);
 
   cp5.getController("password").moveTo("global");
 
@@ -156,16 +162,16 @@ public void load_text() {
 public void textSelected(File selection) {
   if (selection != null) {
     if (!selection.getAbsolutePath().endsWith(".txt")) {
-      cp5.get(Textfield.class, "output").setText("Invalid - please load a .txt file."); 
+      cp5.get(Textarea.class, "message").setText("Invalid - please load a .txt file."); 
       return;
     }
     String[] text = loadStrings(selection.getAbsolutePath());
     String out = "";
     for (String s : text) {
-      out += s;
+      out += s + '\n';
     }
     out = clean(out);
-    cp5.get(Textfield.class, "message").setText(out);
+    cp5.get(Textarea.class, "message").setText(out);
   }
 }
 
@@ -220,31 +226,25 @@ public int[] getRandom() {
 }
 
 public void encode_message() {
-  try {
-    String message = cp5.get(Textfield.class, "message").getText();
-    println(message);
-    String cypher = cp5.get(Textfield.class, "password").getText();
-    println(cypher);
-    r = new Random(cypher.hashCode());
-    message = clean(message);
-    println(message);
-    message = cypher(message, cypher);
-    println(message);
-    message = encode(message);
-    println(message);
-    println("--------------");
-    PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
-    setupCoordList(img);
-    codeImage(img, message);
-    img.save(cp5.get(Textfield.class, "output").getText());
-    cp5.get(Textfield.class, "message").setText("DONE");
-    cp5.get(Textfield.class, "image").clear();
-    cp5.get(Textfield.class, "output").clear();
-    cp5.get(Textfield.class, "password").clear();
-  } 
+  //try {
+  String message = cp5.get(Textarea.class, "message").getText();
+  String cypher = cp5.get(Textfield.class, "password").getText();
+  r = new Random(cypher.hashCode());
+  message = cypher(message, cypher);
+  message = encode(message);
+  PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
+  setupCoordList(img);
+  codeImage(img, message);
+  img.save(cp5.get(Textfield.class, "output").getText());
+  cp5.get(Textarea.class, "message").setText("DONE");
+  cp5.get(Textfield.class, "image").clear();
+  cp5.get(Textfield.class, "output").clear();
+  cp5.get(Textfield.class, "password").clear();
+  //} 
+  /*
   catch (Exception e) {
-    cp5.get(Textfield.class, "image").setText("Unable to load image.");
-  }
+   cp5.get(Textfield.class, "image").setText("Unable to load image.");
+   } */
 }
 
 public void decode_message() {
@@ -254,11 +254,8 @@ public void decode_message() {
     String cypher = cp5.get(Textfield.class, "password").getText();
     r = new Random(cypher.hashCode());
     String message = decodeImage(img);
-    println(message);
     message = decode(message);
-    println(message);
     message = decypher(message, cypher);
-    println(message);
     String outFile = cp5.get(Textfield.class, "output").getText();
     if (outFile.length() > 0) {
       saveStrings(outFile, new String[] {
@@ -280,7 +277,7 @@ public void draw() {
 }
 
 public void clear() {
-  cp5.get(Textfield.class, "message").clear();
+  cp5.get(Textarea.class, "message").clear();
   cp5.get(Textfield.class, "image").clear();
   cp5.get(Textfield.class, "output").clear();
 }
@@ -383,9 +380,9 @@ public String clean(String message) {
   message = message.toLowerCase();
   String out = "";
   for (char c : message.toCharArray()) {
-    if (Character.isLetter(c))
+    if (Character.isLetter(c) || c == '\n')
       out += c;
-    if (Character.isWhitespace(c))
+    else if (Character.isWhitespace(c))
       out += ' ';
   }
   return out;
@@ -415,13 +412,20 @@ public String decode(String encoded) {
 }
 
 public String cypher(String message, String password) {
+  return cypher(message, password, true);
+}
+
+public String cypher(String message, String password, boolean scramble) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  char[] mess = message.toCharArray();
-  char[] pass = password.toCharArray();
+  Random r;
+  if (scramble)
+    r = new Random(cypher(password, password, false).hashCode());
+  else
+    r = new Random(password.hashCode());
   String out = "";
-  for (int i = 0; i < mess.length; i++) {
-    out += cypher(mess[i], pass[i%pass.length]);
+  for (int i = 0; i < message.length(); i++) {
+    out += cypher(message.charAt(i), r.nextInt(28));
   }
   return out;
 }
@@ -429,36 +433,39 @@ public String cypher(String message, String password) {
 public String decypher(String message, String password) {
   if (password.length() == 0) return message;
   message = message.toLowerCase();
-  char[] mess = message.toCharArray();
-  char[] pass = password.toCharArray();
+  Random r = new Random(cypher(password, password, false).hashCode());
   String out = "";
-  for (int i = 0; i < mess.length; i++) {
-    out += decypher(mess[i], pass[i%pass.length]);
+  for (int i = 0; i < message.length(); i++) {
+    out += decypher(message.charAt(i), r.nextInt(28));
   }
   return out;
 }
 
-public char cypher(char c, char p) {
+public char cypher(char c, int p) {
   c = Character.toLowerCase(c);
   int val = ((int)c);
   if (val == 32) val = 123;
+  if (val == 10 || val == 13) val = 124;
   val -= 97;
-  val += (int)p;
-  val %= 27;
+  val += p;
+  val %= 28;
   val += 97;
   if (val == 123) return ' ';
+  else if (val == 124) return '\n';
   return (char)val;
 }
 
-public char decypher(char c, char p) {
+public char decypher(char c, int p) {
   c = Character.toLowerCase(c);
   if (c == ' ') c = '{';
+  if (c == '\n') c = '|';
   int val = ((int)c) - 97;
-  val -= (int)p;
-  while (val < 0) val += 27;
-  val %= 27;
+  val -= p;
+  while (val < 0) val += 28;
+  val %= 28;
   val += 97;
   if (val == 123) return ' ';
+  else if (val == 124) return '\n';
   else return (char)val;
 }
 
@@ -466,7 +473,7 @@ public void controlEvent(ControlEvent theControlEvent) {
   if (theControlEvent.isTab()) {
     if (theControlEvent.getTab().getId() == 0) {
       encode_tab = true;
-      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textarea.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
       cp5.get(Textfield.class, "password").clear();
@@ -475,7 +482,7 @@ public void controlEvent(ControlEvent theControlEvent) {
     } 
     else if (theControlEvent.getTab().getId() == 1) {
       encode_tab = false;
-      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textarea.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
       cp5.get(Textfield.class, "password").clear();
@@ -499,33 +506,34 @@ public void setupCoordList(PImage img) {
 
 public void setupCodes() {
   // Encodings:
-  code.put('u', "00000");
-  code.put('t', "00001");
-  code.put('s', "00010");
-  code.put('r', "00011");
-  code.put('q', "00100");
-  code.put('p', "00101");
-  code.put('o', "00110");
-  code.put('n', "00111");
-  code.put('m', "01000");
-  code.put('l', "01001");
+  code.put('a', "00000");
+  code.put('b', "00001");
+  code.put('c', "00010");
+  code.put('d', "00011");
+  code.put('e', "00100");
+  code.put('f', "00101");
+  code.put('g', "00110");
+  code.put('h', "00111");
+  code.put('i', "01000");
+  code.put('j', "01001");
   code.put('k', "01010");
-  code.put('j', "01011");
-  code.put('i', "01100");
-  code.put('h', "01101");
-  code.put('g', "01110");
-  code.put('f', "01111");
-  code.put('e', "10000");
-  code.put('d', "10001");
-  code.put('c', "10010");
-  code.put('b', "10011");
-  code.put('a', "10100");
-  code.put(' ', "10101");
-  code.put('z', "1011");
+  code.put('l', "01011");
+  code.put('m', "01100");
+  code.put('n', "01101");
+  code.put('o', "01110");
+  code.put('p', "01111");
+  code.put('q', "10000");
+  code.put('r', "10001");
+  code.put('s', "10010");
+  code.put('t', "10011");
+  code.put('u', "10100");
+  code.put('v', "10101");
+  code.put('w', "10110");
+  code.put('x', "10111");
   code.put('y', "1100");
-  code.put('x', "1101");
-  code.put('w', "1110");
-  code.put('v', "1111");
+  code.put('z', "1101");
+  code.put(' ', "1110");
+  code.put('\n', "1111");
   // Decodings:
   Iterator i = code.entrySet().iterator();
   while (i.hasNext ()) {
