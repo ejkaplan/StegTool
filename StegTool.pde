@@ -1,3 +1,5 @@
+float version = 2.41;
+
 import controlP5.*;
 import java.io.File;
 import javax.swing.*;
@@ -24,7 +26,7 @@ void setup() {
 
   size(640, 340);
   background(0);
-  frame.setTitle("StegTool 2.4");
+  frame.setTitle("StegTool"+version);
   cp5 = new ControlP5(this);
 
   cp5.addTab("decode")
@@ -39,15 +41,22 @@ void setup() {
 
   cp5.addTextarea("message")
     .setPosition(20, 30)
-      .setSize(width-140, 40)
-        .setColor(color(255, 0, 0));
+      .setSize(width-140, 50)
+        .setColor(color(200))
+          .setFont(createFont("arial", 11))
+            .setColorBackground(color(255, 100))
+              .setColorForeground(color(255, 100));
 
   decoded_view = cp5.addTextarea("decoded_view")
-    .setPosition(20, 25)
-      .setSize(width-40, 60)
+    .setPosition(20, 30)
+      .setSize(width-140, 50)
         .moveTo("decode")
           .setLineHeight(14)
-            .setFont(14);
+            .setFont(createFont("arial", 11))
+
+              .setColor(color(200))
+                .setColorBackground(color(255, 100))
+                  .setColorForeground(color(255, 100));
 
   cp5.addButton("load_text")
     .setPosition(width-100, 30)
@@ -59,8 +68,9 @@ void setup() {
     .setPosition(20, 90)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .moveTo("global");
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .moveTo("global");
 
   cp5.addButton("load_image")
     .setPosition(width-100, 90)
@@ -74,8 +84,9 @@ void setup() {
     .setPosition(20, 150)
       .setSize(width-140, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .moveTo("global");
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .moveTo("global");
 
   cp5.addButton("save_location")
     .setPosition(width-100, 150)
@@ -89,8 +100,9 @@ void setup() {
     .setPosition(20, 210)
       .setSize(width-40, 40)
         .setFocus(false)
-          .setColor(color(255, 0, 0))
-            .setPasswordMode(true);
+          .setColor(color(200))
+            .setFont(createFont("arial", 14))
+              .setPasswordMode(true);
 
   cp5.getController("password").moveTo("global");
 
@@ -126,7 +138,7 @@ void load_text() {
 void textSelected(File selection) {
   if (selection != null) {
     if (!selection.getAbsolutePath().endsWith(".txt")) {
-      cp5.get(Textfield.class, "output").setText("Invalid - please load a .txt file."); 
+      cp5.get(Textarea.class, "message").setText("Invalid - please load a .txt file."); 
       return;
     }
     String[] text = loadStrings(selection.getAbsolutePath());
@@ -191,31 +203,31 @@ int[] getRandom() {
 
 void encode_message() {
   //try {
-    String message = cp5.get(Textarea.class, "message").getText();
-    println(message);
-    String cypher = cp5.get(Textfield.class, "password").getText();
-    println(cypher);
-    r = new Random(cypher.hashCode());
-    message = clean(message);
-    println(message);
-    message = cypher(message, cypher);
-    println(message);
-    message = encode(message);
-    println(message);
-    println("--------------");
-    PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
-    setupCoordList(img);
-    codeImage(img, message);
-    img.save(cp5.get(Textfield.class, "output").getText());
-    cp5.get(Textfield.class, "message").setText("DONE");
-    cp5.get(Textfield.class, "image").clear();
-    cp5.get(Textfield.class, "output").clear();
-    cp5.get(Textfield.class, "password").clear();
+  String message = cp5.get(Textarea.class, "message").getText();
+  println(message);
+  String cypher = cp5.get(Textfield.class, "password").getText();
+  println(cypher);
+  r = new Random(cypher.hashCode());
+  message = clean(message);
+  println(message);
+  message = cypher(message, cypher);
+  println(message);
+  message = encode(message);
+  println(message);
+  println("--------------");
+  PImage img = loadImage(cp5.get(Textfield.class, "image").getText());
+  setupCoordList(img);
+  codeImage(img, message);
+  img.save(cp5.get(Textfield.class, "output").getText());
+  cp5.get(Textarea.class, "message").setText("DONE");
+  cp5.get(Textfield.class, "image").clear();
+  cp5.get(Textfield.class, "output").clear();
+  cp5.get(Textfield.class, "password").clear();
   //} 
   /*
   catch (Exception e) {
-    cp5.get(Textfield.class, "image").setText("Unable to load image.");
-  } */
+   cp5.get(Textfield.class, "image").setText("Unable to load image.");
+   } */
 }
 
 void decode_message() {
@@ -251,7 +263,7 @@ void draw() {
 }
 
 void clear() {
-  cp5.get(Textfield.class, "message").clear();
+  cp5.get(Textarea.class, "message").clear();
   cp5.get(Textfield.class, "image").clear();
   cp5.get(Textfield.class, "output").clear();
 }
@@ -439,7 +451,7 @@ void controlEvent(ControlEvent theControlEvent) {
   if (theControlEvent.isTab()) {
     if (theControlEvent.getTab().getId() == 0) {
       encode_tab = true;
-      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textarea.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
       cp5.get(Textfield.class, "password").clear();
@@ -448,7 +460,7 @@ void controlEvent(ControlEvent theControlEvent) {
     } 
     else if (theControlEvent.getTab().getId() == 1) {
       encode_tab = false;
-      cp5.get(Textfield.class, "message").clear();
+      cp5.get(Textarea.class, "message").clear();
       cp5.get(Textfield.class, "image").clear();
       cp5.get(Textfield.class, "output").clear();
       cp5.get(Textfield.class, "password").clear();
